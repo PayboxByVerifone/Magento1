@@ -465,7 +465,7 @@ class Paybox_Epayment_Model_Paybox
                 $products[] = $item->getName();
             }
 
-            $data_Paypal .= $this->cleanForPaypalData(implode('-', $products), 127);
+            $data_Paypal .= $this->cleanForPaypalData(implode('-', $products), 489-(iconv_strlen($data_Paypal)));
 
             $values['PBX_PAYPAL_DATA'] = $data_Paypal;
         }
