@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
     <name>Paybox_epayment</name>
-    <version>3.0.6</version>
+    <version>3.0.7</version>
     <stability>stable</stability>
     <license uri="http://opensource.org/licenses/osl-3.0.php">Open Software License (OSL 3.0)</license>
     <channel>community</channel>
@@ -14,6 +14,10 @@ Des outils anti-fraude &#xE0; la carte : 3D Secure, Filtres sur nationalit&#xE9;
 La possibilit&#xE9; de prise de paiement par t&#xE9;l&#xE9;phone&#xD;
 Un acc&#xE8;s Back Office Paybox avec des fonctions de reporting : suivi transactions temps r&#xE9;el et export de journaux d&#x2019;encaissement</description>
     <notes>Change Log&#xD;
+&#xD;
+[3.0.7] 2019-12-06&#xD;
+Modifications&#xD;
+- Changement URLS vers PHP pour permettre à Paylib de fonctionner&#xD;
 &#xD;
 [3.0.6] 2018-01-24&#xD;
 Ajouts&#xD;
