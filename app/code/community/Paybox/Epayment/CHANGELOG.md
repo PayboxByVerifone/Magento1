@@ -1,4 +1,8 @@
 # Change Log
+## [3.0.7] 2019-12-06
+### Modifications
+- Changement URLS vers PHP pour permettre à Paylib de fonctionner
+
 ## [3.0.6] 2018-01-24
 ### Ajouts
 - Remboursement : finalisation (1x & 3x)
