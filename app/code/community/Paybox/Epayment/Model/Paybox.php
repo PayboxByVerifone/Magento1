@@ -486,6 +486,8 @@ class Paybox_Epayment_Model_Paybox
             $values['PBX_REFUSE'] .= $s;
             $values['PBX_REPONDRE_A'] .= $s;
         }
+           $values['PBX_SHOPPINGCART'] = $payment->getXmlShoppingCartInformation($order);
+           $values['PBX_BILLING'] = $payment->getXmlBillingInformation($order);
 
         // PBX Version
         $values['PBX_VERSION'] = 'Magento_' . Mage::getVersion() . '-' . 'paybox' . '_' . Mage::getConfig()->getModuleConfig("Paybox_Epayment")->version;
