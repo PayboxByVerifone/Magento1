@@ -550,6 +550,142 @@ abstract class Paybox_Epayment_Model_Payment_Abstract extends Mage_Payment_Model
         return true;
     }
 
+    
+       protected function formatTextValue($value, $type, $maxLength = null)
+    {
+        /*
+        AN : Alphanumerical without special characters
+        ANP : Alphanumerical with spaces and special characters
+        ANS : Alphanumerical with special characters
+        N : Numerical only
+        A : Alphabetic only
+        */
+
+        switch ($type) {
+            default:
+            case 'AN':
+                $value = $this->remove_accents($value);
+                break;
+            case 'ANP':
+                $value = $this->remove_accents($value);
+                $value = preg_replace('/[^-. a-zA-Z0-9]/', '', $value);
+                break;
+            case 'ANS':
+                break;
+            case 'N':
+                $value = preg_replace('/[^0-9.]/', '', $value);
+                break;
+            case 'A':
+                $value = $this->remove_accents($value);
+                $value = preg_replace('/[^A-Za-z]/', '', $value);
+                break;
+        }
+        // Remove carriage return characters
+        $value = trim(preg_replace("/\r|\n/", '', $value));
+
+        // Cut the string when needed
+        if (!empty($maxLength) && is_numeric($maxLength) && $maxLength > 0) {
+            if (function_exists('mb_strlen')) {
+                if (mb_strlen($value) > $maxLength) {
+                    $value = mb_substr($value, 0, $maxLength);
+                }
+            } elseif (strlen($value) > $maxLength) {
+                $value = substr($value, 0, $maxLength);
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Import XML content as string and use DOMDocument / SimpleXML to validate, if available
+     *
+     * @param string $xml
+     * @return string
+     */
+    protected function exportToXml($xml)
+    {
+        if (class_exists('DOMDocument')) {
+            $doc = new \DOMDocument();
+            $doc->loadXML($xml);
+            $xml = $doc->saveXML();
+        } elseif (function_exists('simplexml_load_string')) {
+            $xml = simplexml_load_string($xml)->asXml();
+        }
+
+        $xml = trim(preg_replace('/(\s*)(' . preg_quote('<?xml version="1.0" encoding="utf-8"?>') . ')(\s*)/', '$2', $xml));
+        $xml = trim(preg_replace("/\r|\n/", '', $xml));
+
+        return $xml;
+    }
+
+    /**
+     * Generate XML value for PBX_BILLING parameter
+     *
+     * @param  Mage_Sales_Model_Order $order
+     * @return string
+     */
+    public function getXmlBillingInformation(Order $order)
+    {
+        // Retrieve billing address from order
+        $address = $order->getBillingAddress();
+
+        $firstName = $this->formatTextValue($address->getCustomerFirstname(), 'ANP', 30);
+        $lastName = $this->formatTextValue($address->getCustomerLastname(), 'ANP', 30);
+        $addressLine1 = is_array($address->getStreet()) ? $this->remove_accents(str_replace(".","",$address->getStreet()[0])) : $this->remove_accents(str_replace(".","",$address->getStreet()));
+        $addressLine2 = (is_array($address->getStreet()) && array_key_exists(1,$address->getStreet())) ? $this->remove_accents(str_replace(".","",$address->getStreet()[1])) : "";
+        $zipCode = $this->formatTextValue($address->getPostcode(), 'ANS', 16);
+        $city = $this->formatTextValue($address->getCity(), 'ANS', 50);
+		$IsoCountry = Mage::helper('pbxep/IsoCountry');
+		$IsoCountry->load($address->country_id);
+		$countryCode = $IsoCountry->IsoCode;
+
+        $xml = sprintf(
+            '<?xml version="1.0" encoding="utf-8"?><Billing><Address><FirstName>%s</FirstName><LastName>%s</LastName><Address1>%s</Address1><Address2>%s</Address2><ZipCode>%s</ZipCode><City>%s</City><CountryCode>%d</CountryCode></Address></Billing>',
+            $firstName,
+            $lastName,
+            $addressLine1,
+            $addressLine2,
+            $zipCode,
+            $city,
+            $countryCode
+        );
+
+        return $this->exportToXml($xml);
+    }
+
+    /**
+     * Generate XML value for PBX_SHOPPINGCART parameter
+     *
+     * @param  Mage_Sales_Model_Order $order
+     * @return string
+     */
+    public function getXmlShoppingCartInformation(Order $order)
+    {
+        $totalQuantity = 0;
+        foreach ($order->getAllVisibleItems() as $item) {
+            $totalQuantity += (int)$item->getQtyOrdered();
+        }
+        $totalQuantity = min($totalQuantity, 99);
+
+        return sprintf('<?xml version="1.0" encoding="utf-8"?><shoppingcart><total><totalQuantity>%d</totalQuantity></total></shoppingcart>', $totalQuantity);
+    }
+
+   	private function remove_accents($string){
+		$table = array(
+			'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj', 'd'=>'d', 'Ž'=>'Z', 'ž'=>'z', 'C'=>'C', 'c'=>'c', 'C'=>'C', 'c'=>'c',
+			'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
+			'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O',
+			'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss',
+			'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e',
+			'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o',
+			'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b',
+			'ÿ'=>'y', 'R'=>'R', 'r'=>'r',
+		);
+		$str =  strtr($string, $table);
+		return $str;
+	}
+
     public function logDebug($message)
     {
         Mage::log($message, Zend_Log::DEBUG, 'paybox-epayment.log');
