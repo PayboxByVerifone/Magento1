@@ -547,7 +547,7 @@ abstract class Paybox_Epayment_Model_Payment_Abstract extends Mage_Payment_Model
         }
 
         // Always off
-        return false;
+        return true;
     }
 
     public function logDebug($message)
