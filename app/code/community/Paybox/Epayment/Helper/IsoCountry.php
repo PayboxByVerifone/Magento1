@@ -1,8 +1,8 @@
 <?php
 /**
- * Sofinco Epayment module for Magento
+ * Paybox Epayment module for Magento
  *
- * Feel free to contact Sofinco at support@paybox.com for any
+ * Feel free to contact paybox at support@paybox.com for any
  * question.
  *
  * LICENSE: This source file is subject to the version 3.0 of the Open
