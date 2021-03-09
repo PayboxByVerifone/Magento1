@@ -23,7 +23,7 @@
 <config>
     <modules>
         <Paybox_Epayment>
-            <version>3.0.6</version>
+            <version>3.0.8</version>
         </Paybox_Epayment>
     </modules>
     <frontend>
@@ -184,7 +184,7 @@
             <environment>TEST</environment>
             <automatic_invoice>0</automatic_invoice>
             <info_to_customer>1</info_to_customer>
-            <debug>1</debug>
+            <debug>0</debug>
             <merchant>
                 <site>1999888</site>
                 <rank>77</rank>
