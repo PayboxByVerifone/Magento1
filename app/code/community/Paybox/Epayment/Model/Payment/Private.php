@@ -27,4 +27,6 @@ class Paybox_Epayment_Model_Payment_Private extends Paybox_Epayment_Model_Paymen
     protected $_allowManualDebit = true;
     protected $_allowDeferredDebit = true;
     protected $_allowRefund = true;
+	protected $_3dsAllowed = true;
+
 }

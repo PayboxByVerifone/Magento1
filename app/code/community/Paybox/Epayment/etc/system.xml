@@ -971,6 +971,56 @@
                                 <active>1</active>
                             </depends>
                         </max_order_total>
+						                        <tds translate="label comment">
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <label>3-D Secure</label>
+                            <sort_order>300</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </tds>
+                        <tds_info translate="label comment">
+                            <label><![CDATA[Make sure that the contract signed with your bank allows 3-D Secure before proceeding with setup.]]></label>
+                            <frontend_model>pbxep/admin_info</frontend_model>
+                            <sort_order>305</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </tds_info>
+                        <tds_active translate="label comment">
+                            <label>Enable 3-D Secure</label>
+                            <comment><![CDATA[<span style="color: red;">Warning: your bank may enforce 3-D Secure.<br/>Make sure your setup is coherent with your bank, Verifone e-commerce and Magento module.</span>]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>pbxep/admin_payment_use3ds</source_model>
+                            <config_path>payment/pbxep_cb/tds_active</config_path>
+                            <sort_order>310</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </tds_active>
+                        <tds_min_order_total translate="label comment">
+                            <label>Minimum Order Amount</label>
+                            <config_path>payment/pbxep_cb/tds_min_order_total</config_path>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>330</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <tds_active>condition</tds_active>
+                                <active>1</active>
+                            </depends>
+                        </tds_min_order_total>
+
                     </fields>
                 </pbxep_private>
                 <pbxep_paypal translate="label comment">

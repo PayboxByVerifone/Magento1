@@ -306,6 +306,7 @@
                 </status>
                 <action>immediate</action>
                 <delay>1</delay>
+                <tds_active>always</tds_active>
                 <cards>
                     <AMEX>
                         <label>American Express</label>

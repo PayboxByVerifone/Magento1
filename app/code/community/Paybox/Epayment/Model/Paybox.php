@@ -234,6 +234,7 @@ class Paybox_Epayment_Model_Paybox
         'Q' => 'time',
         'S' => 'transaction',
         'U' => 'subscriptionData',
+        'v' => '3dsversion',
         'W' => 'date',
         'Y' => 'country',
         'Z' => 'paymentIndex',
@@ -406,12 +407,12 @@ class Paybox_Epayment_Model_Paybox
         }
 
         // 3-D Secure
-        if (!$payment->is3DSEnabled($order)) {
+        if (!$payment->is3DSEnabled($order) && !( $values['PBX_TYPECARTE'] == 'AMEX')){
             $values['PBX_3DS'] = 'N';
         }
 
         // Paybox => Magento
-        $values['PBX_RETOUR'] = 'M:M;R:R;T:T;A:A;B:B;C:C;D:D;E:E;F:F;G:G;I:I;J:J;N:N;O:O;P:P;Q:Q;S:S;W:W;Y:Y;K:K';
+        $values['PBX_RETOUR'] = 'M:M;R:R;T:T;A:A;B:B;C:C;D:D;E:E;F:F;G:G;I:I;J:J;N:N;O:O;P:P;Q:Q;S:S;W:W;Y:Y;v:v;K:K';
         $values['PBX_RUF1'] = 'POST';
 
         // Choose correct language
@@ -486,9 +487,9 @@ class Paybox_Epayment_Model_Paybox
             $values['PBX_REFUSE'] .= $s;
             $values['PBX_REPONDRE_A'] .= $s;
         }
-           $values['PBX_SHOPPINGCART'] = $payment->getXmlShoppingCartInformation($order);
-           $values['PBX_BILLING'] = $payment->getXmlBillingInformation($order);
-
+           $values['PBX_SHOPPINGCART'] = trim(substr($this->getShoppingCartInformation($order),38));
+           $values['PBX_BILLING'] = trim(substr($this->getBillingInformation($order),21));
+																				 																			   
         // PBX Version
         $values['PBX_VERSION'] = 'Magento_' . Mage::getVersion() . '-' . 'paybox' . '_' . Mage::getConfig()->getModuleConfig("Paybox_Epayment")->version;
 
@@ -501,6 +502,74 @@ class Paybox_Epayment_Model_Paybox
         // Hash HMAC
         $values['PBX_HMAC'] = $sign;
         return $values;
+    }
+
+/**generating xml for customer and billing**/
+    public function getShoppingCartInformation(Mage_Sales_Model_Order $order)
+    {
+        $totalQuantity = 0;
+        foreach ($order->getAllVisibleItems() as $item) {
+            $totalQuantity += (int)$item->getQtyOrdered();
+        }
+        $totalQuantity = min($totalQuantity, 99);
+        return sprintf('<?xml version="1.0" encoding="utf-8"?><shoppingcart><total><totalQuantity>%d</totalQuantity></total></shoppingcart>', $totalQuantity);
+        return  $simpleXMLElement->asXML();
+    }
+	
+    public function getBillingInformation(Mage_Sales_Model_Order $order)
+    {
+        $address = $order->getBillingAddress();
+        $firstName = trim($this->remove_accents($order->getCustomerFirstname()));
+        $lastName = trim($this->remove_accents($order->getCustomerLastname()));
+        $address1 = is_array($address->getStreet()) ? $this->remove_accents(str_replace(".","",$address->getStreet()[0])) : $this->remove_accents(str_replace(".","",$address->getStreet()));
+        $address2 = (is_array($address->getStreet()) && array_key_exists(1,$address->getStreet())) ? $this->remove_accents(str_replace(".","",$address->getStreet()[1])) : "";
+        $zipCode = $address->getPostcode();
+        $city = trim($this->remove_accents($address->getCity()));
+		$IsoCountry = Mage::helper('pbxep/IsoCountry');
+		$IsoCountry->load($address->country_id);
+		$countryCode = $IsoCountry->IsoCode;
+
+		$customer_id = $order->getCustomerId();
+		$customerData = Mage::getModel('customer/customer')->load($customer_id); 
+		$title = $customerData->prefix;		
+		if(empty($tilte))$title = "Mr";
+
+
+        $simpleXMLElement = new SimpleXMLElement("<Billing/>");
+        // $billingXML = $simpleXMLElement->addChild('Billing');
+        $addressXML = $simpleXMLElement->addChild('Address');
+        $addressXML->addChild('FirstName',$this->remove_accents($firstName));
+        $addressXML->addChild('LastName',$this->remove_accents($lastName));
+        $addressXML->addChild('Address1',trim(str_replace("."," ",$this->remove_accents($address1))));
+        $addressXML->addChild('Address2',trim(str_replace("."," ",$this->remove_accents($address2))));
+        $addressXML->addChild('ZipCode',$zipCode);
+        $addressXML->addChild('City',$this->remove_accents($city));
+        $addressXML->addChild('CountryCode',$countryCode);
+        
+        return $simpleXMLElement->asXML();
+    }
+
+	private function remove_accents($string){
+		$table = array(
+			'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj', 'd'=>'d', 'Ž'=>'Z', 'ž'=>'z', 'C'=>'C', 'c'=>'c', 'C'=>'C', 'c'=>'c',
+			'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
+			'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O',
+			'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss',
+			'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e',
+			'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o',
+			'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b',
+			'ÿ'=>'y', 'R'=>'R', 'r'=>'r',
+		);
+		$str =  strtr($string, $table);
+		return $str;
+	}
+
+
+
+    public function getCountryCode($countryCode)
+    {
+        $countryMapper = Mage::getSingleton('sf3xep/IsoCountry');
+        return $countryMapper->getIsoCode($countryCode);
     }
 
     public function cleanForPaypalData($string, $nbCaracter = 0)

@@ -97,6 +97,11 @@ $threeTime = $this->getThreeTimeLabels();
         <td><?php echo ($data['3dsWarranty'] == 'O' ? $this->__('Yes') : $this->__('No'));?></td>
     </tr>
 <?php endif; ?>
+<?php if (isset($data['3dsversion'])): ?>    <tr>
+        <td><?php echo $this->__('3-D Secure Version'); ?></td>
+        <td><?php echo $data['3dsversion'];?></td>
+    </tr>
+<?php endif; ?>
 	</table>
 
 <?php if (($controllerName == 'sales_order') && $this->canCapture()): ?>

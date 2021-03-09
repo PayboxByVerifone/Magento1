@@ -1,8 +1,8 @@
 <?php
 /**
- * Paybox Epayment module for Magento
+ * Sofinco Epayment module for Magento
  *
- * Feel free to contact paybox at support@paybox.com for any
+ * Feel free to contact Sofinco at support@paybox.com for any
  * question.
  *
  * LICENSE: This source file is subject to the version 3.0 of the Open
@@ -304,4 +304,20 @@ class Paybox_Epayment_Helper_IsoCountry extends Mage_Core_Helper_Abstract
         "XK" => array( 'alpha2'=>'XK', 'alpha3'=>'KOS', 'num'=>'383', 'isd'=> '383', "name" => "Kosovo", "continent" => "Europe")
     );
 
+	public function load($code){
+		$this->mobile_validator = Mage::helper('sf3xep/MobileValidator');
+		$this->Country = $this->mobile_validator->getCountry($code);
+		if (is_array($this->Country)){
+			$this->PhoneCode = $this->Country['country_code'];
+			$this->Name = $this->Country['country_name'];
+			$this->alpha2 = $this->Country['alpha2'];
+			$this->alpha3 = $this->Country['alpha3'];
+			$this->IsoCode = $this->_countries[$this->Country['alpha2']]['num'];
+		}else{
+			return null;
+		}
+    }
+	public function normalizeNumber($number){
+		return  $this->mobile_validator->normalize($number,$this->alpha2,true); 
+	}
 }
