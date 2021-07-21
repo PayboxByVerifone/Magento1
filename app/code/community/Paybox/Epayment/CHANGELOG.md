@@ -1,4 +1,12 @@
 # Change Log
+## [3.0.9] 2021-07-21
+### Modifications
+- correction des longeurs des champs adressse
+
+## [3.0.8] 2021-02-06
+### Modifications
+- Ajout des champs pour 3dsv2
+
 ## [3.0.7] 2019-12-06
 ### Modifications
 - Changement URLS vers PHP pour permettre à Paylib de fonctionner
