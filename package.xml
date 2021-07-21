@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
     <name>Paybox_epayment</name>
-    <version>3.0.8</version>
+    <version>3.0.9</version>
     <stability>stable</stability>
     <license uri="http://opensource.org/licenses/osl-3.0.php">Open Software License (OSL 3.0)</license>
     <channel>community</channel>
@@ -13,7 +13,10 @@ Une fonction de remboursement partiel ou total d&#x2019;une commande.&#xD;
 Des outils anti-fraude &#xE0; la carte : 3D Secure, Filtres sur nationalit&#xE9;s Carte / IP, alerte paiements multiples.&#xD;
 La possibilit&#xE9; de prise de paiement par t&#xE9;l&#xE9;phone&#xD;
 Un acc&#xE8;s Back Office Paybox avec des fonctions de reporting : suivi transactions temps r&#xE9;el et export de journaux d&#x2019;encaissement</description>
-    <notes>3.0.8&#xD;
+    <notes>3.0.9&#xD;
+Fixing address lengths for 3DS2&#xD;
+&#xD;
+3.0.8&#xD;
 Adding 3DS2&#xD;
 &#xD;
 3.0.7&#xD;
