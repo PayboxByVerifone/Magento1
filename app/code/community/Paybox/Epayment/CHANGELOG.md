@@ -3,7 +3,7 @@
 ### Modifications
 - correction des longeurs des champs adressse
 
-## [3.0.8] 2021-02-06
+## [3.0.8] 2021-03-10
 ### Modifications
 - Ajout des champs pour 3dsv2
 
