@@ -525,25 +525,25 @@ class Paybox_Epayment_Model_Paybox
         $address2 = (is_array($address->getStreet()) && array_key_exists(1,$address->getStreet())) ? $this->remove_accents(str_replace(".","",$address->getStreet()[1])) : "";
         $zipCode = $address->getPostcode();
         $city = trim($this->remove_accents($address->getCity()));
-		$IsoCountry = Mage::helper('pbxep/IsoCountry');
-		$IsoCountry->load($address->country_id);
-		$countryCode = $IsoCountry->IsoCode;
+	$IsoCountry = Mage::helper('pbxep/IsoCountry');
+	$IsoCountry->load($address->country_id);
+	$countryCode = $IsoCountry->IsoCode;
 
-		$customer_id = $order->getCustomerId();
-		$customerData = Mage::getModel('customer/customer')->load($customer_id); 
-		$title = $customerData->prefix;		
-		if(empty($tilte))$title = "Mr";
+	$customer_id = $order->getCustomerId();
+	$customerData = Mage::getModel('customer/customer')->load($customer_id); 
+	$title = $customerData->prefix;		
+	if(empty($tilte))$title = "Mr";
 
 
         $simpleXMLElement = new SimpleXMLElement("<Billing/>");
         // $billingXML = $simpleXMLElement->addChild('Billing');
         $addressXML = $simpleXMLElement->addChild('Address');
-        $addressXML->addChild('FirstName',$this->remove_accents($firstName));
-        $addressXML->addChild('LastName',$this->remove_accents($lastName));
-        $addressXML->addChild('Address1',trim(str_replace("."," ",$this->remove_accents($address1))));
-        $addressXML->addChild('Address2',trim(str_replace("."," ",$this->remove_accents($address2))));
+        $addressXML->addChild('FirstName',$firstName);
+        $addressXML->addChild('LastName',$lastName);
+        $addressXML->addChild('Address1',trim(str_replace("."," ",substr($address1,0,40))));
+        $addressXML->addChild('Address2',trim(str_replace("."," ",substr($address2,0,40))));
         $addressXML->addChild('ZipCode',$zipCode);
-        $addressXML->addChild('City',$this->remove_accents($city));
+        $addressXML->addChild('City',$city);
         $addressXML->addChild('CountryCode',$countryCode);
         
         return $simpleXMLElement->asXML();
