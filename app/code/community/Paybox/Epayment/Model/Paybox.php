@@ -525,15 +525,9 @@ class Paybox_Epayment_Model_Paybox
         $address2 = (is_array($address->getStreet()) && array_key_exists(1,$address->getStreet())) ? $this->remove_accents(str_replace(".","",$address->getStreet()[1])) : "";
         $zipCode = $address->getPostcode();
         $city = trim($this->remove_accents($address->getCity()));
-        
-        // FIX(LkpPo): class sf3xep/IsoCountry doesn't exists...
-		//$IsoCountry = Mage::helper('sf3xep/IsoCountry');
-		//$IsoCountry->load($address->country_id);
-		//$countryCode = $IsoCountry->IsoCode;
-		
-        // FIX(LkpPo): ... but we do not want to validate a phone, just get a code linked to the Alpha2 code of the country.
 		$IsoCountry = Mage::helper('pbxep/IsoCountry');
-		$countryCode = $IsoCountry->getIsoCode($address->country_id);
+		$IsoCountry->load($address->country_id);
+		$countryCode = $IsoCountry->IsoCode;
 
 		$customer_id = $order->getCustomerId();
 		$customerData = Mage::getModel('customer/customer')->load($customer_id); 
@@ -544,12 +538,12 @@ class Paybox_Epayment_Model_Paybox
         $simpleXMLElement = new SimpleXMLElement("<Billing/>");
         // $billingXML = $simpleXMLElement->addChild('Billing');
         $addressXML = $simpleXMLElement->addChild('Address');
-        $addressXML->addChild('FirstName',$this->remove_accents($firstName));
-        $addressXML->addChild('LastName',$this->remove_accents($lastName));
-        $addressXML->addChild('Address1',trim(str_replace("."," ",$this->remove_accents($address1))));
-        $addressXML->addChild('Address2',trim(str_replace("."," ",$this->remove_accents($address2))));
+        $addressXML->addChild('FirstName',$firstName);
+        $addressXML->addChild('LastName',$lastName);
+        $addressXML->addChild('Address1',trim(str_replace("."," ",substr($address1,0,40))));
+        $addressXML->addChild('Address2',trim(str_replace("."," ",substr($address2,0,40))));
         $addressXML->addChild('ZipCode',$zipCode);
-        $addressXML->addChild('City',$this->remove_accents($city));
+        $addressXML->addChild('City',$city);
         $addressXML->addChild('CountryCode',$countryCode);
         
         return $simpleXMLElement->asXML();
@@ -574,7 +568,7 @@ class Paybox_Epayment_Model_Paybox
 
     public function getCountryCode($countryCode)
     {
-        $countryMapper = Mage::getSingleton('sf3xep/IsoCountry');
+        $countryMapper = Mage::getSingleton('pbxep/IsoCountry');
         return $countryMapper->getIsoCode($countryCode);
     }
 
