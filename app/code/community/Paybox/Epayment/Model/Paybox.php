@@ -525,14 +525,14 @@ class Paybox_Epayment_Model_Paybox
         $address2 = (is_array($address->getStreet()) && array_key_exists(1,$address->getStreet())) ? $this->remove_accents(str_replace(".","",$address->getStreet()[1])) : "";
         $zipCode = $address->getPostcode();
         $city = trim($this->remove_accents($address->getCity()));
-	$IsoCountry = Mage::helper('pbxep/IsoCountry');
-	$IsoCountry->load($address->country_id);
-	$countryCode = $IsoCountry->IsoCode;
+		$IsoCountry = Mage::helper('pbxep/IsoCountry');
+		$IsoCountry->load($address->country_id);
+		$countryCode = $IsoCountry->IsoCode;
 
-	$customer_id = $order->getCustomerId();
-	$customerData = Mage::getModel('customer/customer')->load($customer_id); 
-	$title = $customerData->prefix;		
-	if(empty($tilte))$title = "Mr";
+		$customer_id = $order->getCustomerId();
+		$customerData = Mage::getModel('customer/customer')->load($customer_id); 
+		$title = $customerData->prefix;		
+		if(empty($tilte))$title = "Mr";
 
 
         $simpleXMLElement = new SimpleXMLElement("<Billing/>");
@@ -568,7 +568,7 @@ class Paybox_Epayment_Model_Paybox
 
     public function getCountryCode($countryCode)
     {
-        $countryMapper = Mage::getSingleton('sf3xep/IsoCountry');
+        $countryMapper = Mage::getSingleton('pbxep/IsoCountry');
         return $countryMapper->getIsoCode($countryCode);
     }
 
