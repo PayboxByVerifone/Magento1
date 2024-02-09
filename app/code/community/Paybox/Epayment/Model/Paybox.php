@@ -535,7 +535,7 @@ class Paybox_Epayment_Model_Paybox
 		if(empty($tilte))$title = "Mr";
 
 
-        $simpleXMLElement = new SimpleXMLElement("<Billing/>");
+        $simpleXMLElement = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><Billing/>');
         // $billingXML = $simpleXMLElement->addChild('Billing');
         $addressXML = $simpleXMLElement->addChild('Address');
         $addressXML->addChild('FirstName',$firstName);
